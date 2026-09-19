@@ -8,7 +8,7 @@ CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 GEMINI_KEY = os.environ["GEMINI_API_KEY"]
 
 TG_API = f"https://api.telegram.org/bot{BOT_TOKEN}"
-GEMINI_API = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_KEY}"
+GEMINI_API = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
 
 OFFSET_FILE = "offset.txt"
 
@@ -57,7 +57,11 @@ def handle_website(task_text):
         "Include inline CSS and JS in the same file. Make it visually modern and responsive.\n"
         "Return ONLY raw HTML code, no markdown code fences, no explanation."
     )
-    html = clean_code(ask_gemini(prompt))
+    raw = ask_gemini(prompt)
+    if raw.startswith("Gemini error:"):
+        send_message(f"❌ {raw}")
+        return
+    html = clean_code(raw)
     os.makedirs("public", exist_ok=True)
     with open("public/index.html", "w", encoding="utf-8") as f:
         f.write(html)
@@ -70,6 +74,9 @@ def handle_post(task_text):
         "Return ONLY the caption text, nothing else."
     )
     caption = ask_gemini(prompt).strip()
+    if caption.startswith("Gemini error:"):
+        send_message(f"❌ {caption}")
+        return
     img_prompt = re.sub(r"\s+", "%20", task_text.strip())
     image_url = f"https://image.pollinations.ai/prompt/{img_prompt}"
     send_message(f"📝 Caption:\n{caption}\n\n🖼️ Image:\n{image_url}")
