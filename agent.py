@@ -9,7 +9,7 @@ GROQ_KEY = os.environ["GROQ_API_KEY"]
 
 TG_API = f"https://api.telegram.org/bot{BOT_TOKEN}"
 GROQ_API = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL = "openai/gpt-oss-120b"
 
 OFFSET_FILE = "offset.txt"
 
