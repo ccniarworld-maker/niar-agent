@@ -5,10 +5,11 @@ import requests
 
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
-GEMINI_KEY = os.environ["GEMINI_API_KEY"]
+GROQ_KEY = os.environ["GROQ_API_KEY"]
 
 TG_API = f"https://api.telegram.org/bot{BOT_TOKEN}"
-GEMINI_API = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
+GROQ_API = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_MODEL = "llama-3.3-70b-versatile"
 
 OFFSET_FILE = "offset.txt"
 
@@ -34,14 +35,18 @@ def send_message(text):
     requests.post(f"{TG_API}/sendMessage", data={"chat_id": CHAT_ID, "text": text[:4000]})
 
 
-def ask_gemini(prompt):
-    body = {"contents": [{"parts": [{"text": prompt}]}]}
-    r = requests.post(GEMINI_API, json=body)
+def ask_ai(prompt):
+    headers = {"Authorization": f"Bearer {GROQ_KEY}", "Content-Type": "application/json"}
+    body = {
+        "model": GROQ_MODEL,
+        "messages": [{"role": "user", "content": prompt}],
+    }
+    r = requests.post(GROQ_API, headers=headers, json=body)
     data = r.json()
     try:
-        return data["candidates"][0]["content"]["parts"][0]["text"]
+        return data["choices"][0]["message"]["content"]
     except Exception:
-        return f"Gemini error: {json.dumps(data)[:500]}"
+        return f"AI error: {json.dumps(data)[:500]}"
 
 
 def clean_code(text):
@@ -57,8 +62,8 @@ def handle_website(task_text):
         "Include inline CSS and JS in the same file. Make it visually modern and responsive.\n"
         "Return ONLY raw HTML code, no markdown code fences, no explanation."
     )
-    raw = ask_gemini(prompt)
-    if raw.startswith("Gemini error:"):
+    raw = ask_ai(prompt)
+    if raw.startswith("AI error:"):
         send_message(f"❌ {raw}")
         return
     html = clean_code(raw)
@@ -73,8 +78,8 @@ def handle_post(task_text):
         f'Write a short, catchy social media caption with 3-5 relevant hashtags for: "{task_text}"\n'
         "Return ONLY the caption text, nothing else."
     )
-    caption = ask_gemini(prompt).strip()
-    if caption.startswith("Gemini error:"):
+    caption = ask_ai(prompt).strip()
+    if caption.startswith("AI error:"):
         send_message(f"❌ {caption}")
         return
     img_prompt = re.sub(r"\s+", "%20", task_text.strip())
@@ -94,7 +99,7 @@ def classify(task_text):
 
 
 def handle_chat(task_text):
-    send_message(ask_gemini(task_text))
+    send_message(ask_ai(task_text))
 
 
 def main():
