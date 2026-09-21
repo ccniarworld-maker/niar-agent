@@ -1,332 +1,436 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>সিম্পল পোর্টফোলিও</title>
+    <title>QR Code Generator</title>
     <style>
-        :root{
-            --primary:#0d6efd;
-            --bg:#f8f9fa;
-            --text:#212529;
-            --card-bg:#fff;
-            --card-shadow:rgba(0,0,0,0.1);
-            --radius:8px;
-            --transition:.3s ease;
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --card-bg: #fff;
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
         }
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background:var(--bg);
-            color:var(--text);
-            line-height:1.6;
+            background: linear-gradient(135deg, #e0f7fa, #e8f5e9);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            opacity: 0;
+            animation: fadeInBody 0.8s forwards;
         }
-        a{color:inherit;text-decoration:none;}
-        header{
-            background:#fff;
-            box-shadow:0 2px 4px var(--card-shadow);
-            position:sticky;top:0;z-index:1000;
+
+        @keyframes fadeInBody {
+            to { opacity: 1; }
         }
-        .container{
-            width:90%;
-            max-width:1200px;
-            margin:auto;
+
+        header {
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 1rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
-        .nav{
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            padding:1rem 0;
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            animation: slideDown 0.6s ease-out;
         }
-        .logo{
-            font-size:1.5rem;
-            font-weight:bold;
-            color:var(--primary);
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
-        .nav-links{
-            display:flex;
-            gap:2rem;
+
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
         }
-        .nav-links a{
-            position:relative;
-            padding:0.2rem 0;
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
         }
-        .nav-links a::after{
-            content:"";
-            position:absolute;
-            left:0;
-            bottom:0;
-            width:0;
-            height:2px;
-            background:var(--primary);
-            transition:var(--transition);
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            animation: fadeIn 0.8s ease-out;
         }
-        .nav-links a:hover::after{
-            width:100%;
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .hamburger{
-            display:none;
-            flex-direction:column;
-            gap:5px;
-            cursor:pointer;
+
+        .form-group {
+            margin-bottom: 1.5rem;
         }
-        .hamburger div{
-            width:25px;
-            height:3px;
-            background:#333;
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
         }
-        /* Hero */
-        .hero{
-            background:linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
-            color:#fff;
-            text-align:center;
-            padding:6rem 0;
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
-        .hero h1{
-            font-size:2.5rem;
-            margin-bottom:1rem;
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 8px rgba(52,152,219,0.3);
         }
-        .hero p{
-            font-size:1.2rem;
-            margin-bottom:2rem;
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
         }
-        .btn{
-            background:var(--primary);
-            color:#fff;
-            padding:0.8rem 1.5rem;
-            border:none;
-            border-radius:var(--radius);
-            cursor:pointer;
-            transition:var(--transition);
+
+        .size-select {
+            flex: 1;
+            min-width: 120px;
         }
-        .btn:hover{
-            background:#0b5ed7;
+
+        button {
+            background-color: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
-        /* Sections */
-        section{
-            padding:4rem 0;
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
         }
-        h2{
-            text-align:center;
-            margin-bottom:2rem;
-            font-size:2rem;
-            color:var(--primary);
+
+        button:active {
+            transform: translateY(0);
         }
-        .about{
-            display:flex;
-            flex-wrap:wrap;
-            gap:2rem;
-            align-items:center;
+
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
         }
-        .about img{
-            flex:1 1 250px;
-            max-width:300px;
-            border-radius:var(--radius);
+
+        .result-section {
+            margin-top: 2rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s, transform 0.5s;
+            display: none;
         }
-        .about .content{
-            flex:2 1 400px;
+
+        .result-section.active {
+            opacity: 1;
+            transform: translateY(0);
+            display: block;
         }
-        .projects{
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-            gap:1.5rem;
+
+        .qr-code-wrapper {
+            display: inline-block;
+            padding: 1rem;
+            background: #fff;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            animation: popIn 0.5s ease-out;
         }
-        .card{
-            background:var(--card-bg);
-            border-radius:var(--radius);
-            box-shadow:0 2px 6px var(--card-shadow);
-            overflow:hidden;
-            transition:var(--transition);
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
-        .card:hover{
-            transform:translateY(-5px);
-            box-shadow:0 6px 12px var(--card-shadow);
+
+        .qr-code-wrapper img {
+            width: 200px;
+            height: 200px;
+            display: block;
         }
-        .card img{
-            width:100%;
-            height:180px;
-            object-fit:cover;
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
-        .card-body{
-            padding:1rem;
+
+        .action-btn {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
         }
-        .card-body h3{
-            margin-bottom:0.5rem;
-            font-size:1.2rem;
+
+        .action-btn:hover {
+            background-color: var(--primary-color);
+            color: #fff;
         }
-        .card-body p{
-            font-size:0.9rem;
-            color:#555;
+
+        .error-message {
+            color: var(--error-color);
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
-        .contact form{
-            max-width:600px;
-            margin:auto;
-            display:flex;
-            flex-direction:column;
-            gap:1rem;
+
+        .error-message.visible {
+            opacity: 1;
         }
-        .contact input,
-        .contact textarea{
-            padding:0.8rem;
-            border:1px solid #ccc;
-            border-radius:var(--radius);
-            width:100%;
-            font:inherit;
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            color: #777;
+            font-size: 0.9rem;
+            background: #eef2f3;
+            margin-top: auto;
         }
-        .contact button{
-            align-self:flex-start;
-        }
-        footer{
-            background:#212529;
-            color:#fff;
-            text-align:center;
-            padding:1.5rem 0;
-        }
-        @media(max-width:768px){
-            .nav-links{
-                position:absolute;
-                top:100%;
-                right:0;
-                background:#fff;
-                flex-direction:column;
-                width:200px;
-                box-shadow:0 2px 6px var(--card-shadow);
-                transform:translateX(100%);
-                transition:var(--transition);
-            }
-            .nav-links.active{
-                transform:translateX(0);
-            }
-            .hamburger{
-                display:flex;
-            }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.5rem; }
+            .container { padding: 1.5rem; }
+            .qr-code-wrapper img { width: 150px; height: 150px; }
+            button { width: 100%; }
+            .actions { flex-direction: column; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <nav class="nav">
-                <div class="logo">মায়ার পোর্টফোলিও</div>
-                <div class="nav-links" id="navLinks">
-                    <a href="#home">হোম</a>
-                    <a href="#about">আমার সম্পর্কে</a>
-                    <a href="#projects">প্রজেক্ট</a>
-                    <a href="#contact">যোগাযোগ</a>
-                </div>
-                <div class="hamburger" id="hamburger">
-                    <div></div><div></div><div></div>
-                </div>
-            </nav>
-        </div>
-    </header>
 
-    <section class="hero" id="home">
-        <div class="container">
-            <h1>স্বাগতম! আমি রাহুল</h1>
-            <p>ফ্রন্ট-এন্ড ডেভেলপার | UI/UX ডিজাইনার | জাভাস্ক্রিপ্ট প্রোফেশনাল</p>
-            <a href="#contact" class="btn">কন্ট্যাক্ট করুন</a>
-        </div>
-    </section>
+<header>
+    <h1>QR Code Generator</h1>
+    <p class="subtitle">Create QR codes instantly with a modern and professional touch.</p>
+</header>
 
-    <section class="about" id="about">
-        <div class="container">
-            <img src="https://i.pravatar.cc/300" alt="Profile picture">
-            <div class="content">
-                <h2>আমার সম্পর্কে</h2>
-                <p>আমি রাহুল, ৩ বছর বেশি অভিজ্ঞতা সম্পন্ন ফ্রন্ট-এন্ড ডেভেলপার। HTML, CSS, JavaScript এবং React-এ পারদর্শী। ব্যবহারকারী‑কেন্দ্রিক এবং রেস্পনসিভ ডিজাইন তৈরি করতে পছন্দ করি। অবসর সময়ে আমি ফটোগ্রাফি এবং ট্রাভেল ব্লগ লিখি।</p>
+<main>
+    <div class="container">
+        <form id="qr-form" novalidate>
+            <div class="form-group">
+                <label for="text-input">Enter text or URL</label>
+                <input type="text" id="text-input" placeholder="https://example.com" required>
             </div>
-        </div>
-    </section>
 
-    <section class="projects" id="projects">
-        <div class="container">
-            <h2>প্রজেক্টস</h2>
-            <div class="projects">
-                <div class="card">
-                    <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80" alt="Project 1">
-                    <div class="card-body">
-                        <h3>ই-কমার্স সাইট</h3>
-                        <p>React এবং Redux দিয়ে তৈরি একটি সম্পূর্ণ ফিচারড অনলাইন শপ।</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=800&q=80" alt="Project 2">
-                    <div class="card-body">
-                        <h3>পোর্টফোলিও টেমপ্লেট</h3>
-                        <p>একটি আধুনিক, রেস্পনসিভ পোর্টফোলিও টেমপ্লেট।</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=800&q=80" alt="Project 3">
-                    <div class="card-body">
-                        <h3>টাস্ক ম্যানেজার অ্যাপ</h3>
-                        <p>Vue.js এবং Firebase ব্যবহার করে তৈরি টাস্ক ট্র্যাকার।</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80" alt="Project 4">
-                    <div class="card-body">
-                        <h3>ব্লগিং প্লাটফর্ম</h3>
-                        <p>Node.js এবং Express দিয়ে নির্মিত কন্টেন্ট ম্যানেজমেন্ট সিস্টেম।</p>
-                    </div>
+            <div class="controls">
+                <div class="form-group size-select">
+                    <label for="size-select">QR Size (px)</label>
+                    <select id="size-select">
+                        <option value="100">100</option>
+                        <option value="150" selected>150</option>
+                        <option value="200">200</option>
+                        <option value="250">250</option>
+                        <option value="300">300</option>
+                    </select>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <section class="contact" id="contact">
-        <div class="container">
-            <h2>যোগাযোগ করুন</h2>
-            <form id="contactForm">
-                <input type="text" name="name" placeholder="আপনার নাম" required>
-                <input type="email" name="email" placeholder="ইমেইল" required>
-                <textarea name="message" rows="5" placeholder="বার্তা লিখুন..." required></textarea>
-                <button type="submit" class="btn">পাঠান</button>
-            </form>
-            <p id="statusMessage" style="margin-top:1rem;text-align:center;"></p>
-        </div>
-    </section>
+            <button type="submit" id="generate-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 21l-4.35-4.35M16.65 8.65a5 5 0 1 0-7.07 7.07L8 14l6 3 3-6-1.65-1.65z"></path></svg>
+                Generate QR Code
+            </button>
 
-    <footer>
-        <div class="container">
-            &copy; 2026 রাহুল | সকল অধিকার সংরক্ষিত.
-        </div>
-    </footer>
+            <div id="error-msg" class="error-message"></div>
+        </form>
 
-    <script>
-        // Mobile menu toggle
-        const hamburger = document.getElementById('hamburger');
-        const navLinks = document.getElementById('navLinks');
+        <section id="result-section" class="result-section">
+            <div class="qr-code-wrapper">
+                <img id="qr-code-img" src="" alt="QR Code">
+            </div>
 
-        hamburger.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
+            <div class="actions">
+                <button class="action-btn" id="download-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Download
+                </button>
+                <button class="action-btn" id="copy-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    Copy Image
+                </button>
+                <button class="action-btn" id="new-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    New
+                </button>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer>
+    © 2024 QR Code Generator · Made with <span style="color: var(--error-color);">♥</span>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+    const form = document.getElementById('qr-form');
+    const textInput = document.getElementById('text-input');
+    const sizeSelect = document.getElementById('size-select');
+    const generateBtn = document.getElementById('generate-btn');
+    const resultSection = document.getElementById('result-section');
+    const qrCodeImg = document.getElementById('qr-code-img');
+    const errorMsg = document.getElementById('error-msg');
+    const downloadBtn = document.getElementById('download-btn');
+    const copyBtn = document.getElementById('copy-btn');
+    const newBtn = document.getElementById('new-btn');
+
+    let currentQRCode = null;
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const text = textInput.value.trim();
+        if (!text) {
+            showError('Please enter some text or a URL.');
+            return;
+        }
+        showError('');
+        generateQRCode(text);
+    });
+
+    function generateQRCode(text) {
+        const size = parseInt(sizeSelect.value);
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = `<svg class="spinner" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="4"></path></svg> Generating...`;
+        if (currentQRCode) {
+            currentQRCode.clear();
+        }
+        currentQRCode = new QRCode(document.createElement('canvas'), {
+            text: text,
+            width: size,
+            height: size,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
         });
 
-        // Smooth scrolling for internal links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e){
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if(target){
-                    target.scrollIntoView({behavior:'smooth'});
-                }
-                // close mobile menu after click
-                if(navLinks.classList.contains('active')){
-                    navLinks.classList.remove('active');
-                }
-            });
-        });
+        currentQRCode._id = text; // custom property for later reference
 
-        // Simple form submit simulation
-        const form = document.getElementById('contactForm');
-        const status = document.getElementById('statusMessage');
-        form.addEventListener('submit', function(e){
-            e.preventDefault();
-            status.textContent = "ধন্যবাদ! আপনার বার্তা পাঠানো হয়েছে।";
-            status.style.color = "green";
-            form.reset();
-        });
-    </script>
+        // Wait a tick for the canvas to be drawn
+        setTimeout(() => {
+            const canvas = currentQRCode._canvas;
+            const dataURL = canvas.toDataURL('image/png');
+            qrCodeImg.src = dataURL;
+            resultSection.classList.add('active');
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 21l-4.35-4.35M16.65 8.65a5 5 0 1 0-7.07 7.07L8 14l6 3 3-6-1.65-1.65z"></path></svg>
+                Generate QR Code
+            `;
+        }, 300);
+    }
+
+    downloadBtn.addEventListener('click', function() {
+        if (!qrCodeImg.src) return;
+        const link = document.createElement('a');
+        link.href = qrCodeImg.src;
+        link.download = 'qrcode.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+
+    copyBtn.addEventListener('click', async function() {
+        if (!qrCodeImg.src) return;
+        try {
+            const blob = await fetch(qrCodeImg.src).then(r => r.blob());
+            await navigator.clipboard.write([
+                new ClipboardItem({ 'image/png': blob })
+            ]);
+            showToast('QR code image copied to clipboard!');
+        } catch (err) {
+            console.error('Copy failed', err);
+            showToast('Copy not supported or failed.');
+        }
+    });
+
+    newBtn.addEventListener('click', function() {
+        textInput.value = '';
+        textInput.focus();
+        resultSection.classList.remove('active');
+        qrCodeImg.src = '';
+        if (currentQRCode) currentQRCode.clear();
+        showError('');
+    });
+
+    function showError(msg) {
+        if (msg) {
+            errorMsg.textContent = msg;
+            errorMsg.classList.add('visible');
+        } else {
+            errorMsg.classList.remove('visible');
+        }
+    }
+
+    function showToast(msg) {
+        const toast = document.createElement('div');
+        toast.style.position = 'fixed';
+        toast.style.bottom = '20px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.background = '#2ecc71';
+        toast.style.color = '#fff';
+        toast.style.padding = '10px 20px';
+        toast.style.borderRadius = '6px';
+        toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+        toast.style.zIndex = '2000';
+        toast.textContent = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
+    // Auto‑focus input on load
+    window.addEventListener('DOMContentLoaded', () => {
+        textInput.focus();
+    });
+</script>
+
 </body>
 </html>
