@@ -5,11 +5,11 @@ import requests
 
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
-GROQ_KEY = os.environ["GROQ_API_KEY"]
+OPENROUTER_KEY = os.environ["OPENROUTER_API_KEY"]
 
 TG_API = f"https://api.telegram.org/bot{BOT_TOKEN}"
-GROQ_API = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL = "openai/gpt-oss-120b"
+OPENROUTER_API = "https://openrouter.ai/api/v1/chat/completions"
+OPENROUTER_MODEL = "z-ai/glm-5.2:free"
 
 OFFSET_FILE = "offset.txt"
 
@@ -36,12 +36,12 @@ def send_message(text):
 
 
 def ask_ai(prompt):
-    headers = {"Authorization": f"Bearer {GROQ_KEY}", "Content-Type": "application/json"}
+    headers = {"Authorization": f"Bearer {OPENROUTER_KEY}", "Content-Type": "application/json"}
     body = {
-        "model": GROQ_MODEL,
+        "model": OPENROUTER_MODEL,
         "messages": [{"role": "user", "content": prompt}],
     }
-    r = requests.post(GROQ_API, headers=headers, json=body)
+    r = requests.post(OPENROUTER_API, headers=headers, json=body)
     data = r.json()
     try:
         return data["choices"][0]["message"]["content"]
