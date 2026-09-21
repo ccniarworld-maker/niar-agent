@@ -1,125 +1,37 @@
-import os
-import re
-import json
-import requests
+name: Agent Runner
 
-BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
-CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
-OPENROUTER_KEY = os.environ["OPENROUTER_API_KEY"]
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
 
-TG_API = f"https://api.telegram.org/bot{BOT_TOKEN}"
-OPENROUTER_API = "https://openrouter.ai/api/v1/chat/completions"
-OPENROUTER_MODEL = "z-ai/glm-5.2:free"
+permissions:
+  contents: write
 
-OFFSET_FILE = "offset.txt"
+jobs:
+  run-agent:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-def get_offset():
-    if os.path.exists(OFFSET_FILE):
-        content = open(OFFSET_FILE).read().strip()
-        return int(content) if content else 0
-    return 0
+      - run: pip install requests
 
+      - name: Run agent
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: python agent.py
 
-def save_offset(offset):
-    with open(OFFSET_FILE, "w") as f:
-        f.write(str(offset))
-
-
-def get_updates(offset):
-    r = requests.get(f"{TG_API}/getUpdates", params={"offset": offset, "timeout": 5})
-    return r.json().get("result", [])
-
-
-def send_message(text):
-    requests.post(f"{TG_API}/sendMessage", data={"chat_id": CHAT_ID, "text": text[:4000]})
-
-
-def ask_ai(prompt):
-    headers = {"Authorization": f"Bearer {OPENROUTER_KEY}", "Content-Type": "application/json"}
-    body = {
-        "model": OPENROUTER_MODEL,
-        "messages": [{"role": "user", "content": prompt}],
-    }
-    r = requests.post(OPENROUTER_API, headers=headers, json=body)
-    data = r.json()
-    try:
-        return data["choices"][0]["message"]["content"]
-    except Exception:
-        return f"AI error: {json.dumps(data)[:500]}"
-
-
-def clean_code(text):
-    text = text.strip()
-    text = re.sub(r"^```[a-zA-Z]*\n?", "", text)
-    text = re.sub(r"```$", "", text)
-    return text.strip()
-
-
-def handle_website(task_text):
-    prompt = (
-        f'Generate a complete, polished, single-file HTML website for this request: "{task_text}"\n'
-        "Include inline CSS and JS in the same file. Make it visually modern and responsive.\n"
-        "Return ONLY raw HTML code, no markdown code fences, no explanation."
-    )
-    raw = ask_ai(prompt)
-    if raw.startswith("AI error:"):
-        send_message(f"❌ {raw}")
-        return
-    html = clean_code(raw)
-    os.makedirs("public", exist_ok=True)
-    with open("public/index.html", "w", encoding="utf-8") as f:
-        f.write(html)
-    send_message("✅ Website generated -> public/index.html. Vercel will auto-deploy in ~1 min.")
-
-
-def handle_post(task_text):
-    prompt = (
-        f'Write a short, catchy social media caption with 3-5 relevant hashtags for: "{task_text}"\n'
-        "Return ONLY the caption text, nothing else."
-    )
-    caption = ask_ai(prompt).strip()
-    if caption.startswith("AI error:"):
-        send_message(f"❌ {caption}")
-        return
-    img_prompt = re.sub(r"\s+", "%20", task_text.strip())
-    image_url = f"https://image.pollinations.ai/prompt/{img_prompt}"
-    send_message(f"📝 Caption:\n{caption}\n\n🖼️ Image:\n{image_url}")
-
-
-def classify(task_text):
-    t = task_text.lower()
-    website_kw = ["website", "site", "webpage", "ওয়েবসাইট", "সাইট", "পেজ"]
-    post_kw = ["post", "caption", "পোস্ট", "ক্যাপশন", "ছবি"]
-    if any(k in t for k in website_kw):
-        return "website"
-    if any(k in t for k in post_kw):
-        return "post"
-    return "chat"
-
-
-def handle_chat(task_text):
-    send_message(ask_ai(task_text))
-
-
-def main():
-    offset = get_offset()
-    updates = get_updates(offset)
-    for u in updates:
-        offset = u["update_id"] + 1
-        msg = u.get("message", {})
-        text = msg.get("text", "")
-        if not text or text.startswith("/start"):
-            continue
-        kind = classify(text)
-        if kind == "website":
-            handle_website(text)
-        elif kind == "post":
-            handle_post(text)
-        else:
-            handle_chat(text)
-    save_offset(offset)
-
-
-if __name__ == "__main__":
-    main()
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git pull --rebase --autostash origin main
+          git add -A
+          git diff --cached --quiet || git commit -m "Agent update"
+          git push
