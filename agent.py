@@ -15,10 +15,7 @@ OPENROUTER_API = "https://openrouter.ai/api/v1/chat/completions"
 OPENROUTER_MODELS = [
     "z-ai/glm-5.2:free",
     "nvidia/nemotron-3-ultra-550b-a55b:free",
-    "poolside/laguna-s-2.1:free",
-    "poolside/laguna-xs-2.1:free",
     "cohere/north-mini-code:free",
-    "openrouter/free",
 ]
 
 OFFSET_FILE = "offset.txt"
